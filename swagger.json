@@ -1,0 +1,169 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "E-Commerce REST API",
+    "description": "Full CRUD REST API for an e-commerce store using Node.js, Express, MongoDB, JWT authentication.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local server"
+    }
+  ],
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Register a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterUser"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User registered successfully" },
+          "400": { "description": "User already exists" }
+        }
+      }
+    },
+
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Login user and return JWT token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginUser"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login success, token returned" },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+
+    "/api/products": {
+      "post": {
+        "tags": ["Products"],
+        "security": [{ "bearerAuth": [] }],
+        "summary": "Create a product (protected route)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Product" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Product created" },
+          "400": { "description": "Validation error" }
+        }
+      },
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get all products",
+        "responses": {
+          "200": { "description": "Product list fetched" }
+        }
+      }
+    },
+
+    "/api/products/{id}": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get product by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Product details" },
+          "404": { "description": "Product not found" }
+        }
+      },
+      "put": {
+        "tags": ["Products"],
+        "security": [{ "bearerAuth": [] }],
+        "summary": "Update product by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Product" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Product updated successfully" },
+          "404": { "description": "Product not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Products"],
+        "security": [{ "bearerAuth": [] }],
+        "summary": "Delete product by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Product deleted" },
+          "404": { "description": "Product not found" }
+        }
+      }
+    }
+  },
+
+  "components": {
+    "schemas": {
+      "RegisterUser": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "Sowmiya" },
+          "email": { "type": "string", "example": "test@gmail.com" },
+          "password": { "type": "string", "example": "123456" }
+        }
+      },
+
+      "LoginUser": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "example": "test@gmail.com" },
+          "password": { "type": "string", "example": "123456" }
+        }
+      },
+
+      "Product": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "iPhone 15" },
+          "description": { "type": "string", "example": "Latest model" },
+          "price": { "type": "number", "example": 75000 },
+          "images": { "type": "array", "items": { "type": "string" } },
+          "stock": { "type": "number", "example": 10 }
+        }
+      }
+    },
+
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
